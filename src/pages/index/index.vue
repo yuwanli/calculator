@@ -46,7 +46,7 @@
     <div class="desc" v-if="array.length > 0">
       <div class="desc-equal">1{{before}} = {{equal}}{{after}}</div>
       <div class="desc-item">数据仅供参考，交易时以银行柜台成交价为准。</div>
-      <div class="desc-item">更新时间：{{data['美元'].date}} {{data['美元'].time}}</div>
+      <div class="desc-item">更新时间：{{updateTime}}</div>
     </div>
   </div>
 </template>
@@ -61,10 +61,17 @@ export default {
       before: '人民币',
       after: '美元',
       data: {
+        '人民币': {
+          img: '/assets/images/zg.png'
+        },
+        '美元': {
+          img: '/assets/images/mg.png'
+        }
       },
       array: [],
       beforeIndex: 0,
       afterIndex: 0,
+      updateTime: '',
       imgUrls: [
         '/assets/images/demo1.jpg',
         '/assets/images/demo2.jpg'
@@ -75,8 +82,10 @@ export default {
     try {
       let storageData = JSON.parse(wx.getStorageSync('calcu_data'))
       let storageArray = JSON.parse(wx.getStorageSync('calcu_array'))
+      let updateTime = JSON.parse(wx.getStorageSync('calcu_update'))
       this.data = storageData
       this.array = storageArray
+      this.updateTime = updateTime
     } catch (e) {
       this.init()
     }
@@ -92,31 +101,46 @@ export default {
   methods: {
     init () {
       getData().then(res => {
+        this.updateTime = res.update
+        res = this.formatData(res.list)
         let result = {}
         let array = []
-        res[0] = {
-          ...res[0],
+        res = {
+          ...res,
           '人民币': {
             'bankConversionPri': '100',
             'value': ''
           }
         }
-        for (let i in res[0]) {
+        for (let i in res) {
           if (baseInfo[i]) { // 存在在base表中的返回
             result[i] = {
-              ...res[0][i],
+              ...res[i],
               ...baseInfo[i]
             }
             array.push(i)
           }
         }
-        console.log(result)
         this.data = result
         this.array = array
         this.afterIndex = this.array.indexOf('美元')
         wx.setStorageSync('calcu_data', JSON.stringify(this.data))
         wx.setStorageSync('calcu_array', JSON.stringify(this.array))
+        wx.setStorageSync('calcu_update', JSON.stringify(this.updateTime))
       })
+    },
+    formatData (res) {
+      let result = {}
+      res.forEach(val => {
+        result[val[0]] = {
+          'bankConversionPri': val[5],
+          'fBuyPri': val[2], // 现汇买入价
+          'mBuyPri': val[3], /* 现钞买入价 */
+          'mSellPri': val[4], /* 现钞卖出价 */
+          'name': val[0]
+        }
+      })
+      return result
     },
     clearValue (target) {
       this.data[this[target]].value = 0
