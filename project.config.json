@@ -1,5 +1,5 @@
 {
-	"description": "项目配置文件。",
+	"description": "汇率计算",
 	"setting": {
 		"urlCheck": false,
 		"es6": false,
@@ -10,7 +10,8 @@
 	"miniprogramRoot": "dist/wx/",
 	"compileType": "miniprogram",
 	"appid": "wx11abb1d4934e8041",
-	"projectname": "calculator",
+  "projectname": "calculator",
+  "cloudfunctionRoot": "cloudfunction/",
 	"condition": {
 		"search": {
 			"current": -1,

@@ -2,8 +2,8 @@
   <div class="container" >
     <swiper class="adv" circular="true" autoplay="true" interval="5000" duration="1000" indicatorDots="true" indicator-active-color="#f21818">
       <block v-for="item in imgUrls" v-bind:key="item.id">
-        <swiper-item>
-          <image mode="aspectFill" :src="item" class="adv-image"/>
+        <swiper-item @click="adClick(item)">
+          <image mode="aspectFill" :src="item.img" class="adv-image"/>
         </swiper-item>
       </block>
     </swiper>
@@ -72,13 +72,17 @@ export default {
       beforeIndex: 0,
       afterIndex: 0,
       updateTime: '',
-      imgUrls: [
-        '/assets/images/demo1.jpg',
-        '/assets/images/demo2.jpg'
-      ]
+      imgUrls: []
     }
   },
   created () {
+    wx.cloud.init({
+      traceUser: true
+    })
+    const db = wx.cloud.database()
+    db.collection('ads').get().then(res => {
+      this.imgUrls = res.data
+    })
     try {
       let storageData = JSON.parse(wx.getStorageSync('calcu_data'))
       let storageArray = JSON.parse(wx.getStorageSync('calcu_array'))
@@ -99,6 +103,13 @@ export default {
     }
   },
   methods: {
+    adClick (item) {
+      wx.showToast({
+        title: item.url,
+        icon: 'none',
+        duration: 2000
+      })
+    },
     init () {
       getData().then(res => {
         this.updateTime = res.update
