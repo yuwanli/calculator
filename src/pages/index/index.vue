@@ -1,9 +1,9 @@
 <template>
   <div class="container" >
-    <swiper class="adv" circular="true" autoplay="true" interval="5000" duration="1000" indicatorDots="true" indicator-active-color="#f21818">
+    <swiper v-if="imgUrls.length > 0" class="adv" circular="true" autoplay="true" interval="5000" duration="500" indicatorDots="true" indicator-active-color="#f21818">
       <block v-for="item in imgUrls" v-bind:key="item.id">
-        <swiper-item @click="adClick(item)">
-          <image mode="aspectFill" :src="item.img" class="adv-image"/>
+        <swiper-item class="advItem">
+          <image mode="aspectFill" :src="item.img" @click="adClick(item)" class="adv-image"/>
         </swiper-item>
       </block>
     </swiper>
@@ -72,7 +72,8 @@ export default {
       beforeIndex: 0,
       afterIndex: 0,
       updateTime: '',
-      imgUrls: []
+      imgUrls: [],
+      openId: ''
     }
   },
   created () {
@@ -83,16 +84,22 @@ export default {
     db.collection('ads').get().then(res => {
       this.imgUrls = res.data
     })
-    try {
-      let storageData = JSON.parse(wx.getStorageSync('calcu_data'))
-      let storageArray = JSON.parse(wx.getStorageSync('calcu_array'))
-      let updateTime = JSON.parse(wx.getStorageSync('calcu_update'))
-      this.data = storageData
-      this.array = storageArray
-      this.updateTime = updateTime
-    } catch (e) {
-      this.init()
-    }
+    wx.cloud.callFunction({
+      name: 'getUserInfo',
+      complete: res => {
+        this.openId = res.result.OPENID
+      }
+    })
+    // try {
+    //   let storageData = JSON.parse(wx.getStorageSync('calcu_data'))
+    //   let storageArray = JSON.parse(wx.getStorageSync('calcu_array'))
+    //   let updateTime = JSON.parse(wx.getStorageSync('calcu_update'))
+    //   this.data = storageData
+    //   this.array = storageArray
+    //   this.updateTime = updateTime
+    // } catch (e) {
+    this.init()
+    // }
   },
   computed: {
     equal () {
@@ -104,6 +111,11 @@ export default {
   },
   methods: {
     adClick (item) {
+      wx.reportAnalytics('ad_click', {
+        id: item.id,
+        adv_name: item.name,
+        open_id: this.openId
+      })
       wx.showToast({
         title: item.url,
         icon: 'none',
@@ -135,9 +147,9 @@ export default {
         this.data = result
         this.array = array
         this.afterIndex = this.array.indexOf('美元')
-        wx.setStorageSync('calcu_data', JSON.stringify(this.data))
-        wx.setStorageSync('calcu_array', JSON.stringify(this.array))
-        wx.setStorageSync('calcu_update', JSON.stringify(this.updateTime))
+        // wx.setStorageSync('calcu_data', JSON.stringify(this.data))
+        // wx.setStorageSync('calcu_array', JSON.stringify(this.array))
+        // wx.setStorageSync('calcu_update', JSON.stringify(this.updateTime))
       })
     },
     formatData (res) {
