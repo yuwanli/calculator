@@ -146,7 +146,8 @@ export default {
         }
         this.data = result
         this.array = array
-        this.afterIndex = this.array.indexOf('美元')
+        this.afterIndex = this.array.indexOf(this.after)
+        this.beforeIndex = this.array.indexOf(this.before)
         // wx.setStorageSync('calcu_data', JSON.stringify(this.data))
         // wx.setStorageSync('calcu_array', JSON.stringify(this.array))
         // wx.setStorageSync('calcu_update', JSON.stringify(this.updateTime))
@@ -166,15 +167,19 @@ export default {
       return result
     },
     clearValue (target) {
-      this.data[this[target]].value = 0
+      // this.data[this[target]].value = ''
+      this.data[this.before].value = ''
+      this.data[this.after].value = ''
     },
     bindPickerChange (e, current, target) {
       let targetValue = this.data[this[current]].value
       let index = e.mp.detail.value
-      this[`${current}Index`] = index
-      this[current] = this.array[index]
-      this.data[this[current]].value = targetValue
-      this.getReuslt(targetValue, this.data[this[current]], this.data[this[target]])
+      if (this[`${current}Index`] !== index) {
+        this[`${current}Index`] = index
+        this[current] = this.array[index]
+        this.data[this[current]].value = targetValue
+        this.getReuslt(targetValue, this.data[this[current]], this.data[this[target]])
+      }
     },
     input (e, current, target) {
       let targetObj = this.data[this[target]] // 目标对象
@@ -257,7 +262,7 @@ export default {
       line-height: 48/@bs;
       height: 48/@bs;
       flex: 1;
-      transition: all 0.3s ease;
+      transition: all 0.3s ease-out;
       &.padding{
         padding-right: 36/@bs;
       }
