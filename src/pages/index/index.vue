@@ -101,6 +101,11 @@ export default {
     this.init()
     // }
   },
+  onLoad () {
+    if (this.$root.$mp.query.name) {
+      this.after = this.$root.$mp.query.name
+    }
+  },
   computed: {
     equal () {
       let targetObj = this.data[this.before] || {}

@@ -11,7 +11,7 @@
       <div class="title-left">中行折算价</div>
       <div class="title-right">更新时间：{{updateTime}}</div>
     </div>
-    <div class="tool" v-for="item in data" v-bind:key="item.id">
+    <div class="tool" v-for="item in data" v-bind:key="item.id" @click="toIndex(item.name)">
       <image mode="aspectFill" class="tool-img" :src="item.img"></image>
       <div class="tool-name">{{item.name|| '人名币'}}</div>
       <div class="tool-label">{{item.label}}</div>
@@ -62,6 +62,11 @@ export default {
     this.init()
   },
   methods: {
+    toIndex (str) {
+      wx.navigateTo({
+        url: `/pages/index/main?name=${str}`
+      })
+    },
     getValue (n) {
       return (+n).toFixed(2)
     },

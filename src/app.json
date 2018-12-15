@@ -1,7 +1,7 @@
 {
   "pages": [
-    "pages/index/tool/main",
-    "pages/index/main"
+    "pages/index/main",
+    "pages/index/tool/main"
   ],
   "cloud": true,
   "window": {
